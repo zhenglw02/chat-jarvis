@@ -11,6 +11,7 @@ from modules.ear.baidu_ear import BaiduEar
 from modules.mouth.baidu_mouth import BaiduMouth
 from modules.brain.gpt35_brain import GPT35Brain
 from modules.memory.memory_memory import MemoryMemory
+from modules.brain.brain_interface import ChatItem
 import logging
 
 
@@ -36,44 +37,44 @@ class Jarvis:
         # 忽略耳朵的误触发
         if content is None or content == "":
             return
-        user_voice_message = {"role": "user", "content": content}
-        self._brain.handle_request(user_voice_message, self.handle_brain_result)
+        user_voice_chat_item = ChatItem.new("user", content)
+        self._brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
-    def handle_brain_result(self, message):
+    def handle_brain_result(self, chat_item: ChatItem, finish: bool):
         # 暂停听力，防止听到自己说的话，又触发对话逻辑，陷入死循环
         self._ear.pause()
 
-        if message.get("function_call"):
-            self._logger.info("function_call: {}".format(message.get("function_call")))
-            self.execute_function_call(message)
+        if chat_item.function_call:
+            self._logger.info("function_call: {}".format(chat_item.function_call))
+            self.execute_function_call(chat_item)
             self._ear.go_on()
         else:
-            def handle_speak_finish():
+            if len(chat_item.content) > 0:  # 百度的tts服务不支持空字符串，所以这里判断一下
+                self._mouth.speak(chat_item.content, self._ear.go_on if finish else lambda: {})
+            elif finish:  # 一般content为空时的回调，应该都是说完了，finish应该都是true，这里保险判断一下
                 self._ear.go_on()
 
-            self._mouth.speak(message.get("content"), handle_speak_finish)
-
-    def execute_function_call(self, assistant_message):
-        if assistant_message["function_call"]["name"] in self._function_map:
-            function_info = self._function_map.get(assistant_message["function_call"]["name"])
+    def execute_function_call(self, assistant_chat_item: ChatItem):
+        if assistant_chat_item.function_call["name"] in self._function_map:
+            function_info = self._function_map.get(assistant_chat_item.function_call["name"])
 
             def handle_speak_finish():
                 # 校验以下模型生成的调用参数是否合法，一般调show_text()展示代码的时候可能生成的参数不对
                 try:
-                    arguments = json.loads(assistant_message["function_call"]["arguments"])
+                    arguments = json.loads(assistant_chat_item.function_call["arguments"])
                 except JSONDecodeError as e:
                     self._mouth.speak("调用插件使用的参数不太对，这次先不调了。", lambda: {})
                     return
 
                 result = function_info["function"](arguments)
                 if result.need_call_brain:
-                    function_message = {"role": "function", "name": assistant_message["function_call"]["name"],
-                                        "content": result.result if result.result is not None else ""}
-                    self._brain.handle_request(function_message, self.handle_brain_result)
+                    function_chat_item = ChatItem.new("function", result.result if result.result is not None else "",
+                                                      name=assistant_chat_item.function_call["name"])
+                    self._brain.handle_request(function_chat_item, self.handle_brain_result)
 
             self._mouth.speak("正在{}".format(function_info["chinese_name"]), handle_speak_finish)
         else:
-            self._mouth.speak("未知的程序名称：{}".format(assistant_message["function_call"]["name"]), lambda: {})
+            self._mouth.speak("未知的程序名称：{}".format(assistant_chat_item.function_call["name"]), lambda: {})
 
     def sleep(self, args: dict):
         """
