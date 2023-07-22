@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from jarvis.jarvis import Jarvis
 
 
 class PluginResult(object):
@@ -18,6 +19,10 @@ class PluginResult(object):
 
 
 class AbstractPlugin(metaclass=ABCMeta):
+
+    @abstractmethod
+    def valid(self) -> bool:
+        pass
 
     @abstractmethod
     def init(self, logger: logging.Logger):
@@ -40,5 +45,5 @@ class AbstractPlugin(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self, args: dict) -> PluginResult:
+    def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         pass

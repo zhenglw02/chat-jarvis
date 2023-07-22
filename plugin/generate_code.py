@@ -1,13 +1,19 @@
 import logging
 import openai
-from config import system_config
+import os
+import time
+from config import system_config, const
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
+from jarvis.jarvis import Jarvis
 
 openai.api_key = system_config.GENERATE_CODE_OPENAI_API_KEY
 
 
 class GenerateCodePlugin(AbstractPlugin):
+    def valid(self) -> bool:
+        return True
+
     def __init__(self):
         self._logger = None
 
@@ -35,7 +41,7 @@ class GenerateCodePlugin(AbstractPlugin):
             "required": ["request"],
         }
 
-    def run(self, args: dict) -> PluginResult:
+    def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         response = openai.ChatCompletion.create(
             model=system_config.GENERATE_CODE_OPENAI_MODEL,
             messages=[
@@ -45,4 +51,7 @@ class GenerateCodePlugin(AbstractPlugin):
         )
         message = response.choices[0].message
         self._logger.debug("code gen result: \n{}\n".format(message.content))
-        return PluginResult.new(result=message.content, need_call_brain=True)
+        file_name = f"generate_code={str(int(time.time()))}.md"
+        with open(os.path.join(const.TEMP_DIR_PATH, file_name), "w") as f:
+            f.write(message.content)
+        return PluginResult.new(result=f"已经将代码生成到文件【{file_name}】中", need_call_brain=True)

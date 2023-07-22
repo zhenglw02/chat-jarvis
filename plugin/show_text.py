@@ -3,9 +3,17 @@ import tkinter as tk
 import threading
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
+from jarvis.jarvis import Jarvis
 
 
 class ShowTextPlugin(AbstractPlugin):
+    def valid(self) -> bool:
+        """
+        过时的插件，可以用show_file插件代替。后续插件和大脑之间长文本内容的传递应该尽量使用文件，可以减少不必要的上下文长度。
+        :return:
+        """
+        return False
+
     def __init__(self):
         self._logger = None
 
@@ -36,7 +44,7 @@ class ShowTextPlugin(AbstractPlugin):
             "required": ["content"],
         }
 
-    def run(self, args: dict) -> PluginResult:
+    def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         def display():
             # 创建主窗口
             window = tk.Tk()

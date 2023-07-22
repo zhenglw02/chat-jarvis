@@ -17,4 +17,8 @@ DEV_PID = 15372
 URI = "ws://vop.baidu.com/realtime_asr"
 
 # 系统配置
+# 日志级别
 LOG_LEVEL = logging.DEBUG
+
+# 临时文件保存地址
+TEMP_DIR_PATH = "./temp"

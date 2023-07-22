@@ -1,5 +1,5 @@
 from modules.ear.ear_interface import AbstractEar
-from config.const import APP_ID, API_KEY, DEV_PID, URI
+from config import const
 from config.system_config import AI_NAME, PER_REQUEST_THRESHOLD_IN_SECOND
 
 import websocket
@@ -41,14 +41,17 @@ class BaiduEar(AbstractEar):
 
         self.check_finish_sentence()
 
-        uri = URI + "?sn=" + str(uuid.uuid1())
-        ws_app = websocket.WebSocketApp(uri,
-                                        on_open=self.on_open,  # 连接建立后的回调
-                                        on_message=self.on_message,  # 接收消息的回调
-                                        on_error=self.on_error,  # 库遇见错误的回调
-                                        on_close=self.on_close)  # 关闭后的回调
-        self._ws = ws_app
-        ws_app.run_forever()
+        def run(*args):
+            uri = const.URI + "?sn=" + str(uuid.uuid1())
+            ws_app = websocket.WebSocketApp(uri,
+                                            on_open=self.on_open,  # 连接建立后的回调
+                                            on_message=self.on_message,  # 接收消息的回调
+                                            on_error=self.on_error,  # 库遇见错误的回调
+                                            on_close=self.on_close)  # 关闭后的回调
+            self._ws = ws_app
+            ws_app.run_forever()
+
+        threading.Thread(target=run).start()
 
     def stop(self):
         self.send_finish(self._ws)
@@ -108,9 +111,9 @@ class BaiduEar(AbstractEar):
         req = {
             "type": "START",
             "data": {
-                "appid": APP_ID,  # 网页上的appid
-                "appkey": API_KEY,  # 网页上的appid对应的appkey
-                "dev_pid": DEV_PID,  # 识别模型
+                "appid": const.APP_ID,  # 网页上的appid
+                "appkey": const.API_KEY,  # 网页上的appid对应的appkey
+                "dev_pid": const.DEV_PID,  # 识别模型
                 "cuid": "yourself_defined_user_id",  # 随便填不影响使用。机器的mac或者其它唯一id，百度计算UV用。
                 "sample": 16000,  # 固定参数
                 "format": "pcm"  # 固定参数
@@ -129,13 +132,16 @@ class BaiduEar(AbstractEar):
                         frames_per_buffer=CHUNK)  # 打开流，传入响应参数
 
         while True:
-            if not self._pause:
-                data = stream.read(2560)
-                ws.send(data, websocket.ABNF.OPCODE_BINARY)
-            else:
-                time.sleep(0.2)
-                # 长时间不向服务端发请求，服务端会报错，因此暂停时定时发送一段空内容
-                ws.send(None, websocket.ABNF.OPCODE_BINARY)
+            try:
+                if not self._pause:
+                    data = stream.read(2560)
+                    ws.send(data, websocket.ABNF.OPCODE_BINARY)
+                else:
+                    time.sleep(0.2)
+                    # 长时间不向服务端发请求，服务端会报错，因此暂停时定时发送一段空内容
+                    ws.send(None, websocket.ABNF.OPCODE_BINARY)
+            except Exception as e:
+                self._logger.error(f"baidu_ear try listen and send data failed, exception: {e}")
 
     def send_finish(self, ws):
         """

@@ -1,11 +1,12 @@
 import logging
 import time
+import os
 
 from aip import AipSpeech
 import pygame
 
 from modules.mouth.mouth_interface import AbstractMouth
-from config.const import APP_ID_STR, API_KEY, SECRET_KEY
+from config import const
 from config import system_config
 
 
@@ -16,7 +17,7 @@ class BaiduMouth(AbstractMouth):
 
     def init(self, logger: logging.Logger):
         self._logger = logger
-        self._client = AipSpeech(APP_ID_STR, API_KEY, SECRET_KEY)
+        self._client = AipSpeech(const.APP_ID_STR, const.API_KEY, const.SECRET_KEY)
         # 初始化pygame，用于播放mp3文件
         pygame.mixer.init()
         # 设置音量 范围为0.0到1.0
@@ -31,7 +32,7 @@ class BaiduMouth(AbstractMouth):
 
         # 识别正确返回语音二进制 错误则返回dict
         if not isinstance(result, dict):
-            with open('./temp/audio.mp3', 'wb') as f:
+            with open(os.path.join(const.TEMP_DIR_PATH, "audio.mp3"), 'wb') as f:
                 f.write(result)
             # 加载音频文件
             pygame.mixer.music.load("./temp/audio.mp3")

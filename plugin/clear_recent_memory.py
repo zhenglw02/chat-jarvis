@@ -1,11 +1,10 @@
 import logging
-import datetime
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
 
 
-class GetDatetimePlugin(AbstractPlugin):
+class ClearRecentMemoryPlugin(AbstractPlugin):
     def valid(self) -> bool:
         return True
 
@@ -16,13 +15,13 @@ class GetDatetimePlugin(AbstractPlugin):
         self._logger = logger
 
     def get_name(self):
-        return "get_datetime"
+        return "clear_recent_memory"
 
     def get_chinese_name(self):
-        return "查询当前时间"
+        return "清空记忆"
 
     def get_description(self):
-        return "获取当前时间的接口，当我询问你关于日期、时间相关的问题时，你应该调用本接口，根据接口返回的时间信息回答我的问题。"
+        return "清空记忆接口，当我要求你清空记忆时，你应该调用本接口。注意：本接口不接收任何参数，当你调用本接口时你不应该传递任何参数进来。"
 
     def get_parameters(self):
         return {
@@ -32,6 +31,6 @@ class GetDatetimePlugin(AbstractPlugin):
         }
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
-        now = datetime.datetime.now()
-        result = "今天是{}年{}月{}日{}时{}分{}秒".format(now.year, now.month, now.day, now.hour, now.minute, now.second)
-        return PluginResult.new(result=result, need_call_brain=True)
+        jarvis.memory.clear_recent()
+        jarvis.mouth.speak("已清空最近的记忆。", lambda: {})
+        return PluginResult.new("", False)
