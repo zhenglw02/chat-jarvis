@@ -10,7 +10,7 @@ from jarvis.jarvis import Jarvis
 openai.api_key = system_config.SUMMARY_FILE_OPENAI_API_KEY
 
 
-class GenerateCodePlugin(AbstractPlugin):
+class SummaryFilePlugin(AbstractPlugin):
     def valid(self) -> bool:
         return True
 

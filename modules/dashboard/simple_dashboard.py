@@ -28,12 +28,12 @@ class SimpleDashboard(AbstractDashBoard):
             self._text_entry = tk.Text(window, height=50, width=100)
             self._text_entry.pack()
 
-            def callback_user_input():
-                content = self._text_entry.get("1.0", tk.END)
-                callback(content)
-
-            submit_button = tk.Button(window, text="提交", command=callback_user_input)
+            submit_button = tk.Button(window, text="干活了",
+                                      command=lambda: callback(self._text_entry.get("1.0", tk.END), ""))
             submit_button.pack()
+
+            shutup_button = tk.Button(window, text="别说了", command=lambda: callback("", "shutup"))
+            shutup_button.pack()
 
             window.mainloop()
 

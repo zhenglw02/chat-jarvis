@@ -11,3 +11,11 @@ class AbstractMouth(metaclass=ABCMeta):
     @abstractmethod
     def speak(self, content, finish_callback):
         pass
+
+    @abstractmethod
+    def shutup(self):
+        pass
+
+    @abstractmethod
+    def wait_speak_finish(self):
+        pass

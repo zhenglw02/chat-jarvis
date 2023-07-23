@@ -20,9 +20,8 @@ class Jarvis:
         self._function_map = function_map
 
     def start(self):
-        self.ear.start(self.handle_ear_result)
-        self.dashboard.start(self.handle_dashboard_result)
-        self.mouth.speak("贾维斯已启动，等待您的唤醒。", lambda: {})
+        self.mouth.speak("贾维斯已启动，等待您的唤醒。", lambda: (self.ear.start(self.handle_ear_result),
+                                                                self.dashboard.start(self.handle_dashboard_result)))
 
     def handle_ear_result(self, content):
         # 忽略耳朵的误触发
@@ -36,7 +35,13 @@ class Jarvis:
         user_voice_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
-    def handle_dashboard_result(self, content):
+    def handle_dashboard_result(self, content, action):
+        if action is not None and action != "":
+            if action == "shutup":
+                self.mouth.shutup()
+                self.ear.go_on()
+                return
+
         if content is None or content == "":
             return
         user_input_chat_item = ChatItem.new("user", content)
@@ -49,11 +54,13 @@ class Jarvis:
         if chat_item.function_call:
             self._logger.info("function_call: {}".format(chat_item.function_call))
             self.execute_function_call(chat_item)
+            self.mouth.wait_speak_finish()
             self.ear.go_on()
         else:
             if len(chat_item.content) > 0:  # 百度的tts服务不支持空字符串，所以这里判断一下
                 self.mouth.speak(chat_item.content, self.ear.go_on if finish else lambda: {})
             elif finish:  # 一般content为空时的回调，应该都是说完了，finish应该都是true，这里保险判断一下
+                self.mouth.wait_speak_finish()
                 self.ear.go_on()
 
     def execute_function_call(self, assistant_chat_item: ChatItem):

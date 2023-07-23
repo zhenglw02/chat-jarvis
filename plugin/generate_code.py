@@ -51,7 +51,7 @@ class GenerateCodePlugin(AbstractPlugin):
         )
         message = response.choices[0].message
         self._logger.debug("code gen result: \n{}\n".format(message.content))
-        file_name = f"generate_code={str(int(time.time()))}.md"
+        file_name = f"generate_code-{str(int(time.time()))}.md"
         with open(os.path.join(const.TEMP_DIR_PATH, file_name), "w") as f:
             f.write(message.content)
         return PluginResult.new(result=f"已经将代码生成到文件【{file_name}】中", need_call_brain=True)
