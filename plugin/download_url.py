@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
-from config import const
+from config import system_config
 from jarvis.jarvis import Jarvis
 
 
@@ -71,7 +71,7 @@ class DownloadURLPlugin(AbstractPlugin):
             # 找到页面中的所有文本内容
             text_content = soup.get_text()
             file_name = "download_url-{}.txt".format(str(int(time.time())))
-            with open(os.path.join(const.TEMP_DIR_PATH, file_name), "w") as f:
+            with open(os.path.join(system_config.TEMP_DIR_PATH, file_name), "w") as f:
                 f.write(text_content)
 
         finally:

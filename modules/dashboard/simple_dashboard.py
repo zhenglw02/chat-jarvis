@@ -3,10 +3,10 @@ import openai
 import tkinter as tk
 import threading
 
-from config.system_config import OPENAI_API_KEY
+from config.system_config import BRAIN_OPENAI_API_KEY
 from modules.dashboard.dashboard_interface import AbstractDashBoard
 
-openai.api_key = OPENAI_API_KEY
+openai.api_key = BRAIN_OPENAI_API_KEY
 
 
 class SimpleDashboard(AbstractDashBoard):
@@ -18,7 +18,7 @@ class SimpleDashboard(AbstractDashBoard):
     def init(self, logger: logging.Logger):
         self._logger = logger
 
-    def start(self, callback):
+    def start(self, callback: callable):
         def wait_user_input(*args):
             # 创建主窗口
             window = tk.Tk(className="jarvis dashboard")

@@ -1,5 +1,4 @@
 import json
-
 from json.decoder import JSONDecodeError
 
 from modules.brain.brain_interface import ChatItem
@@ -23,7 +22,12 @@ class Jarvis:
         self.mouth.speak("贾维斯已启动，等待您的唤醒。", lambda: (self.ear.start(self.handle_ear_result),
                                                                 self.dashboard.start(self.handle_dashboard_result)))
 
-    def handle_ear_result(self, content):
+    def handle_ear_result(self, content: str):
+        """
+        耳朵的回调，当听到用户说话并停止一段时间后触发
+        :param content: 听到的内容
+        :return:
+        """
         # 忽略耳朵的误触发
         if content is None or content == "":
             return
@@ -35,7 +39,13 @@ class Jarvis:
         user_voice_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
-    def handle_dashboard_result(self, content, action):
+    def handle_dashboard_result(self, content: str, action: str):
+        """
+        交互板的回调，用户手动点击交互板的按钮时触发
+        :param content: 用户输入的内容
+        :param action: 用户点击的动作
+        :return:
+        """
         if action is not None and action != "":
             if action == "shutup":
                 self.mouth.shutup()
@@ -48,6 +58,12 @@ class Jarvis:
         self.brain.handle_request(user_input_chat_item, self.handle_brain_result)
 
     def handle_brain_result(self, chat_item: ChatItem, finish: bool):
+        """
+        大脑的回调
+        :param chat_item: 大脑生成的结果
+        :param finish: 是否结束
+        :return:
+        """
         # 暂停听力，防止听到自己说的话，又触发对话逻辑，陷入死循环
         self.ear.pause()
 
@@ -64,6 +80,11 @@ class Jarvis:
                 self.ear.go_on()
 
     def execute_function_call(self, assistant_chat_item: ChatItem):
+        """
+        处理大脑发出的函数调用的指令
+        :param assistant_chat_item:
+        :return:
+        """
         if assistant_chat_item.function_call["name"] in self._function_map:
             function_info = self._function_map.get(assistant_chat_item.function_call["name"])
 
@@ -72,6 +93,8 @@ class Jarvis:
                 try:
                     arguments = json.loads(assistant_chat_item.function_call["arguments"])
                 except JSONDecodeError as e:
+                    self._logger.error("json loads arguments failed, arguments: {}, exception: {}".format(
+                        assistant_chat_item.function_call["arguments"], e))
                     self.mouth.speak("调用插件使用的参数不太对，这次先不调了。", lambda: {})
                     return
 

@@ -22,7 +22,8 @@ class GetDatetimePlugin(AbstractPlugin):
         return "查询当前时间"
 
     def get_description(self):
-        return "获取当前时间的接口，当我询问你关于日期、时间相关的问题时，你应该调用本接口，根据接口返回的时间信息回答我的问题。"
+        return "获取当前时间的接口，当我询问你关于日期、时间相关的问题时，你应该调用本接口，根据接口返回的时间信息回答我的问题。\n" \
+               "当你需要操作日程时，你应该调用本接口，获取当前时间，然后根据当前时间计算出调用【管理日程接口】的正确参数。"
 
     def get_parameters(self):
         return {

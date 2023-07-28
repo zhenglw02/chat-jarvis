@@ -4,7 +4,7 @@ import platform
 import os
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
-from config import const
+from config import system_config
 from jarvis.jarvis import Jarvis
 
 
@@ -41,7 +41,7 @@ class ShowFilePlugin(AbstractPlugin):
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         try:
-            file_path = os.path.join(const.TEMP_DIR_PATH, args.get('file_path'))
+            file_path = os.path.join(system_config.TEMP_DIR_PATH, args.get('file_path'))
             # 获取当前操作系统
             current_os = platform.system()
 

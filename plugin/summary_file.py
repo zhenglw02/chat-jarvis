@@ -2,7 +2,7 @@ import logging
 import os
 import openai
 
-from config import system_config, const
+from config import system_config
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
@@ -42,7 +42,7 @@ class SummaryFilePlugin(AbstractPlugin):
         }
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
-        with open(os.path.join(const.TEMP_DIR_PATH, args.get("file_path")), "r") as f:
+        with open(os.path.join(system_config.TEMP_DIR_PATH, args.get("file_path")), "r") as f:
             content = f.read()
         response = openai.ChatCompletion.create(
             model=system_config.SUMMARY_FILE_OPENAI_MODEL,

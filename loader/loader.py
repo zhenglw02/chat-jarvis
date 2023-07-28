@@ -14,6 +14,11 @@ from modules.memory.memory_memory import MemoryMemory
 
 
 def load(logger: logging.Logger):
+    """
+    加载贾维斯对象
+    :param logger:
+    :return:
+    """
     jarvis = Jarvis()
 
     function_map = {}
@@ -45,6 +50,7 @@ def load(logger: logging.Logger):
 
     jarvis.init(logger, function_map)
 
+    # todo 支持配置所有组件的实现类
     jarvis.mouth = BaiduMouth()
     jarvis.mouth.init(logger)
 

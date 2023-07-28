@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from config import const
+from config import system_config
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
@@ -41,6 +41,6 @@ class WriteFilePlugin(AbstractPlugin):
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         file_name = f"write_file-{str(int(time.time()))}.md"
-        with open(os.path.join(const.TEMP_DIR_PATH, file_name), "w") as f:
+        with open(os.path.join(system_config.TEMP_DIR_PATH, file_name), "w") as f:
             f.write(args.get("content"))
         return PluginResult.new(result="已将内容写入到文件【{}】中。".format(file_name), need_call_brain=True)

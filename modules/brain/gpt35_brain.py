@@ -5,9 +5,9 @@ from modules.brain.brain_interface import AbstractBrain
 from modules.memory.memory_interface import AbstractMemory
 from openai.error import RateLimitError
 from modules.brain.brain_interface import ChatItem
-from modules.brain.util import is_break_char
+from modules.brain.util import has_break_char
 
-openai.api_key = system_config.OPENAI_API_KEY
+openai.api_key = system_config.BRAIN_OPENAI_API_KEY
 
 
 class GPT35Brain(AbstractBrain):
@@ -18,13 +18,13 @@ class GPT35Brain(AbstractBrain):
         self._functions = None
         self._memory = None
 
-    def init(self, logger: logging.Logger, functions, memory: AbstractMemory):
+    def init(self, logger: logging.Logger, functions: list, memory: AbstractMemory):
         self._logger = logger
         self._functions = functions
         self._memory = memory
-        self._memory.save(ChatItem.new("system", system_config.SYSTEM_PROMPT))
+        self._memory.save(ChatItem.new("system", system_config.BRAIN_OPENAI_SYSTEM_PROMPT))
 
-    def handle_request(self, chat_item: ChatItem, result_callback):
+    def handle_request(self, chat_item: ChatItem, result_callback: callable):
         self._memory.save(chat_item)
         chat_items = self._memory.load_recent()
         messages = []
@@ -33,7 +33,7 @@ class GPT35Brain(AbstractBrain):
         self._logger.debug("chat with messages: {}".format(messages))
         try:
             response = openai.ChatCompletion.create(
-                model=system_config.OPENAI_MODEL,
+                model=system_config.BRAIN_OPENAI_MODEL,
                 messages=messages,
                 functions=self._functions,
                 stream=True,
@@ -51,7 +51,7 @@ class GPT35Brain(AbstractBrain):
                 if not is_function_call and 'content' in chunk_message:
                     total_content += chunk_message['content']
                     temp_content += chunk_message['content']
-                    if is_break_char(chunk_message['content']) and len(
+                    if has_break_char(chunk_message['content']) and len(
                             temp_content) >= system_config.START_SPEAK_CONTENT_LENGTH:
                         result_callback(ChatItem.new("assistant", temp_content), False)
                         temp_content = ""
@@ -71,7 +71,7 @@ class GPT35Brain(AbstractBrain):
             result_callback(fake_rate_limit_message, True)
 
 
-def chat_item_to_message(chat_item: ChatItem):
+def chat_item_to_message(chat_item: ChatItem) -> dict:
     message = {
         "role": chat_item.role,
         "content": chat_item.content,

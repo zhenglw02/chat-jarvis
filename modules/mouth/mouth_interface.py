@@ -9,7 +9,7 @@ class AbstractMouth(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def speak(self, content, finish_callback):
+    def speak(self, content: str, finish_callback: callable):
         pass
 
     @abstractmethod
