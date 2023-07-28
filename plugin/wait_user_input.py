@@ -2,9 +2,17 @@ import logging
 import tkinter as tk
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
+from jarvis.jarvis import Jarvis
 
 
 class WaitUserInputPlugin(AbstractPlugin):
+    def valid(self) -> bool:
+        """
+        过时的插件，被dashboard组件替代。相比于这个插件，dashboard是更好的交互方式。
+        :return:
+        """
+        return False
+
     def __init__(self):
         self._logger = None
         self._user_input = None
@@ -32,7 +40,7 @@ class WaitUserInputPlugin(AbstractPlugin):
             "required": [],
         }
 
-    def run(self, args: dict) -> PluginResult:
+    def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         self._user_input = ""
 
         def get_text_and_destroy():

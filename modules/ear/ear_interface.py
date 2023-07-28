@@ -9,7 +9,7 @@ class AbstractEar(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def start(self, callback):
+    def start(self, callback: callable):
         pass
 
     @abstractmethod

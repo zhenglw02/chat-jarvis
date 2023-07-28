@@ -1,15 +1,13 @@
 import logging
 import openai
-from config.system_config import AI_NAME, OPENAI_MODEL, OPENAI_API_KEY, START_SPEAK_CONTENT_LENGTH
+from config import system_config
 from modules.brain.brain_interface import AbstractBrain
 from modules.memory.memory_interface import AbstractMemory
 from openai.error import RateLimitError
 from modules.brain.brain_interface import ChatItem
-from modules.brain.util import is_break_char
+from modules.brain.util import has_break_char
 
-openai.api_key = OPENAI_API_KEY
-
-system_prompt = "你是一个人工智能管家，你的名字是{}。".format(AI_NAME)
+openai.api_key = system_config.BRAIN_OPENAI_API_KEY
 
 
 class GPT35Brain(AbstractBrain):
@@ -20,13 +18,13 @@ class GPT35Brain(AbstractBrain):
         self._functions = None
         self._memory = None
 
-    def init(self, logger: logging.Logger, functions, memory: AbstractMemory):
+    def init(self, logger: logging.Logger, functions: list, memory: AbstractMemory):
         self._logger = logger
         self._functions = functions
         self._memory = memory
-        self._memory.save(ChatItem.new("system", system_prompt))
+        self._memory.save(ChatItem.new("system", system_config.BRAIN_OPENAI_SYSTEM_PROMPT))
 
-    def handle_request(self, chat_item: ChatItem, result_callback):
+    def handle_request(self, chat_item: ChatItem, result_callback: callable):
         self._memory.save(chat_item)
         chat_items = self._memory.load_recent()
         messages = []
@@ -35,7 +33,7 @@ class GPT35Brain(AbstractBrain):
         self._logger.debug("chat with messages: {}".format(messages))
         try:
             response = openai.ChatCompletion.create(
-                model=OPENAI_MODEL,
+                model=system_config.BRAIN_OPENAI_MODEL,
                 messages=messages,
                 functions=self._functions,
                 stream=True,
@@ -53,7 +51,8 @@ class GPT35Brain(AbstractBrain):
                 if not is_function_call and 'content' in chunk_message:
                     total_content += chunk_message['content']
                     temp_content += chunk_message['content']
-                    if is_break_char(chunk_message['content']) and len(temp_content) >= START_SPEAK_CONTENT_LENGTH:
+                    if has_break_char(chunk_message['content']) and len(
+                            temp_content) >= system_config.START_SPEAK_CONTENT_LENGTH:
                         result_callback(ChatItem.new("assistant", temp_content), False)
                         temp_content = ""
 
@@ -66,9 +65,13 @@ class GPT35Brain(AbstractBrain):
         except RateLimitError as e:
             fake_rate_limit_message = ChatItem.new("assistant", "我的大脑被限流了，请等待一分钟再和我说话")
             result_callback(fake_rate_limit_message, True)
+        except Exception as e:
+            self._logger.error(f"call openai api failed, exception: {e}")
+            fake_rate_limit_message = ChatItem.new("assistant", "我的大脑出问题了，请稍后再试。")
+            result_callback(fake_rate_limit_message, True)
 
 
-def chat_item_to_message(chat_item: ChatItem):
+def chat_item_to_message(chat_item: ChatItem) -> dict:
     message = {
         "role": chat_item.role,
         "content": chat_item.content,

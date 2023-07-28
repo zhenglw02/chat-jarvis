@@ -9,6 +9,7 @@ class ChatItem:
         self.role = None
         self.content = None
         self.function_call = None
+        # 函数调用的结果中使用该参数传递函数名
         self.name = None
 
     @staticmethod
@@ -24,9 +25,9 @@ class ChatItem:
 class AbstractBrain(metaclass=ABCMeta):
 
     @abstractmethod
-    def init(self, logger: logging.Logger, functions, memory: AbstractMemory):
+    def init(self, logger: logging.Logger, functions: list, memory: AbstractMemory):
         pass
 
     @abstractmethod
-    def handle_request(self, chat_item: ChatItem, result_callback):
+    def handle_request(self, chat_item: ChatItem, result_callback: callable):
         pass

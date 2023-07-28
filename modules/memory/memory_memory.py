@@ -1,7 +1,6 @@
 import logging
 
 from config import system_config
-
 from modules.memory.memory_interface import AbstractMemory
 
 
@@ -22,7 +21,7 @@ class MemoryMemory(AbstractMemory):
         if len(self._messages) > system_config.MEMORY_MAX_LENGTH:
             self._logger.debug("memory is max, clean")
             _new_messages = [self._system_prompt]
-            for message in self._messages[1-system_config.MEMORY_MAX_LENGTH:]:
+            for message in self._messages[1 - system_config.MEMORY_MAX_LENGTH:]:
                 _new_messages.append(message)
             self._messages = _new_messages
 
