@@ -94,7 +94,7 @@ class BaiduEar(AbstractEar):
         :param message: json格式，自行解析
         :return:
         """
-        self._logger.debug("ear get response: " + message)
+        self._logger.debug("ear get response: {}".format(message))
         m = json.loads(message)
         if m["type"] == "MID_TEXT" or m["type"] == "FIN_TEXT":
             self._last_message_time = time.time()
@@ -176,7 +176,7 @@ class BaiduEar(AbstractEar):
         :param error: json格式，自行解析
         :return:
         """
-        self._logger.error("ear get error: " + str(error))
+        self._logger.error("ear get error: {}".format(error))
 
     def on_close(self, a, b, c):
         """
