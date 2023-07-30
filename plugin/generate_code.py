@@ -27,7 +27,8 @@ class GenerateCodePlugin(AbstractPlugin):
         return "生成代码"
 
     def get_description(self):
-        return "生成代码接口，当你需要生成代码时你应该调用本接口，而不应该自己直接生成代码。"
+        return "生成代码接口，当你需要生成代码时你应该调用本接口，而不应该自己直接生成代码。\n" \
+               "注意：当你调用本接口时，你传入的【生成代码的要求】参数应该与我上一句话的内容保持一致，你不需要也不允许修改任何内容。如果我上一句话中有代码模板或示例，你也应该传入参数中。"
 
     def get_parameters(self):
         return {
@@ -35,7 +36,8 @@ class GenerateCodePlugin(AbstractPlugin):
             "properties": {
                 "request": {
                     "type": "string",
-                    "description": "生成代码的要求",
+                    "description": "生成代码的要求。\n"
+                                   "注意：本参数的值应该与我上一句话的内容保持一致，你不需要也不允许修改任何内容。如果我上一句话中有代码模板或示例，你也应该传入本参数中。",
                 }
             },
             "required": ["request"],
