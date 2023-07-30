@@ -134,7 +134,7 @@ class BaiduEar(AbstractEar):
         while True:
             try:
                 if not self._pause:
-                    data = stream.read(2560)
+                    data = stream.read(2560, exception_on_overflow=False)
                     ws.send(data, websocket.ABNF.OPCODE_BINARY)
                 else:
                     time.sleep(0.1)

@@ -19,8 +19,8 @@ class Jarvis:
         self._function_map = function_map
 
     def start(self):
-        self.mouth.speak("贾维斯已启动，等待您的唤醒。", lambda: (self.ear.start(self.handle_ear_result),
-                                                                self.dashboard.start(self.handle_dashboard_result)))
+        self.mouth.speak("贾维斯已启动，等待您的唤醒。", lambda: (self.ear.start(self.handle_ear_result)))
+        self.dashboard.start(self.handle_dashboard_result)
 
     def handle_ear_result(self, content: str):
         """
