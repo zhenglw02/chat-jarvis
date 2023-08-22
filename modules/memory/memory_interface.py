@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from modules.model.chat_item import ChatItem
 
 
 class AbstractMemory(metaclass=ABCMeta):
@@ -9,7 +10,7 @@ class AbstractMemory(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def save(self, message):
+    def save(self, message: ChatItem):
         pass
 
     @abstractmethod

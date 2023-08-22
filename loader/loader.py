@@ -8,9 +8,10 @@ from plugin.plugin_interface import AbstractPlugin
 import abc
 from modules.ear.baidu_ear import BaiduEar
 from modules.mouth.baidu_mouth import BaiduMouth
-from modules.brain.gpt35_brain import GPT35Brain
+from modules.brain.openai_brain import OpenAIBrain
 from modules.dashboard.simple_dashboard import SimpleDashboard
 from modules.memory.memory_memory import MemoryMemory
+from modules.long_memory.chroma_long_memory import ChromaLongMemory
 
 
 def load(logger: logging.Logger):
@@ -60,10 +61,13 @@ def load(logger: logging.Logger):
     jarvis.memory = MemoryMemory()
     jarvis.memory.init(logger)
 
-    jarvis.brain = GPT35Brain()
+    jarvis.brain = OpenAIBrain()
     jarvis.brain.init(logger, functions, jarvis.memory)
 
     jarvis.dashboard = SimpleDashboard()
     jarvis.dashboard.init(logger)
+
+    jarvis.long_memory = ChromaLongMemory()
+    jarvis.long_memory.init(logger)
 
     return jarvis

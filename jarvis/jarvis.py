@@ -8,6 +8,7 @@ class Jarvis:
     def __init__(self):
         self.mouth = None
         self.memory = None
+        self.long_memory = None
         self.brain = None
         self.ear = None
         self.dashboard = None

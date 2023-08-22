@@ -4,13 +4,14 @@ from config import system_config
 from modules.brain.brain_interface import AbstractBrain
 from modules.memory.memory_interface import AbstractMemory
 from openai.error import RateLimitError
-from modules.brain.brain_interface import ChatItem
 from modules.brain.util import has_break_char
+from modules.model.chat_item import ChatItem
 
 openai.api_key = system_config.BRAIN_OPENAI_API_KEY
+openai.api_base = system_config.BRAIN_OPENAI_API_BASE
 
 
-class GPT35Brain(AbstractBrain):
+class OpenAIBrain(AbstractBrain):
     def __init__(self):
         self._logger = None
         self._client = None

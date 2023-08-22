@@ -8,6 +8,7 @@ from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
 
 openai.api_key = system_config.SUMMARY_FILE_OPENAI_API_KEY
+openai.api_base = system_config.SUMMARY_FILE_OPENAI_API_BASE
 
 
 class SummaryFilePlugin(AbstractPlugin):

@@ -7,3 +7,4 @@ PyAudio~=0.2.13
 pygame~=2.5.0
 baidu-aip~=4.16.11
 chardet~=5.1.0
+chromadb~=0.4.4

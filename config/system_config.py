@@ -6,6 +6,9 @@ AI_NAME = "贾维斯"
 # 临时文件保存地址
 TEMP_DIR_PATH = "./temp"
 
+# 贾维斯自身数据存储地址，很重要
+SYSTEM_DATA_PATH = "./system_data"
+
 # 系统配置
 # 日志级别
 LOG_LEVEL = logging.DEBUG
@@ -39,6 +42,7 @@ BAIDU_MOUTH_SPEAK_PER = 3
 # 使用的openai模型
 BRAIN_OPENAI_MODEL = "gpt-3.5-turbo"
 BRAIN_OPENAI_API_KEY = "sk-xxx"
+BRAIN_OPENAI_API_BASE = "https://api.openai.com"
 BRAIN_OPENAI_SYSTEM_PROMPT = f"你是一个人工智能管家，你的名字是{AI_NAME}。你本质上是我编写的一个程序，但你在和我交流时表现为一个专业的管家。\n" \
                 f"你有耳朵，可以听到我说的话；你有嘴巴，可以说话；你有一个交互板，可以通过交互板获取我手动输入的文字；\n" \
                 f"你有很多额外能力可以通过函数调用的方式使用，你应该注重函数的使用。\n" \
@@ -50,12 +54,22 @@ START_SPEAK_CONTENT_LENGTH = 20
 
 # 记忆相关配置
 # 最多保存多长的记忆
-MEMORY_MAX_LENGTH = 10
+MEMORY_MAX_LENGTH = 20
+MEMORY_SUMMARY_OPENAI_API_KEY = "sk-xxx"
+MEMORY_SUMMARY_OPENAI_MODEL = "gpt-3.5-turbo"
+MEMORY_SUMMARY_OPENAIAPI_BASE = "https://api.openai.com"
 
 # 写代码插件相关配置
 GENERATE_CODE_OPENAI_API_KEY = "sk-xxx"
 GENERATE_CODE_OPENAI_MODEL = "gpt-3.5-turbo-0613"
+GENERATE_CODE_OPENAI_API_BASE = "https://api.openai.com"
 
 # 提取摘要插件相关配置
 SUMMARY_FILE_OPENAI_API_KEY = "sk-xxx"
 SUMMARY_FILE_OPENAI_MODEL = "gpt-3.5-turbo-16k"
+SUMMARY_FILE_OPENAI_API_BASE = "https://api.openai.com"
+
+# 谷歌搜索插件相关配置
+GOOGLE_SEARCH_ENABLE = True
+GOOGLE_SEARCH_API_KEY = "xxx"
+GOOGLE_SEARCH_CX = "xxx"

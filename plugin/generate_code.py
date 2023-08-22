@@ -8,6 +8,7 @@ from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
 
 openai.api_key = system_config.GENERATE_CODE_OPENAI_API_KEY
+openai.api_base = system_config.GENERATE_CODE_OPENAI_API_BASE
 
 
 class GenerateCodePlugin(AbstractPlugin):
