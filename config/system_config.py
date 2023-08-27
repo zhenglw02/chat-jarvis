@@ -14,6 +14,7 @@ SYSTEM_DATA_PATH = "./system_data"
 LOG_LEVEL = logging.DEBUG
 
 # 耳朵相关配置
+EAR_CLASS = "modules.ear.baidu_ear.BaiduEar"
 # 百度应用ID
 BAIDU_EAR_APP_ID = 0
 # 百度语音识别地址，可以改为wss://
@@ -27,6 +28,7 @@ BAIDU_EAR_SECRET_KEY = "xxx"
 BAIDU_EAR_PER_REQUEST_THRESHOLD_IN_SECOND = 1.0
 
 # 嘴巴相关配置
+MOUTH_CLASS = "modules.mouth.baidu_mouth.BaiduMouth"
 BAIDU_MOUTH_APP_ID = "36167526"
 # 百度鉴权信息
 BAIDU_MOUTH_API_KEY = "xxx"
@@ -39,6 +41,7 @@ BAIDU_MOUTH_SPEAK_SPEED = 5
 BAIDU_MOUTH_SPEAK_PER = 3
 
 # 大脑相关配置
+BRAIN_CLASS = "modules.brain.openai_brain.OpenAIBrain"
 # 使用的openai模型
 BRAIN_OPENAI_MODEL = "gpt-3.5-turbo"
 BRAIN_OPENAI_API_KEY = "sk-xxx"
@@ -53,11 +56,20 @@ BRAIN_OPENAI_SYSTEM_PROMPT = f"你是一个人工智能管家，你的名字是{
 START_SPEAK_CONTENT_LENGTH = 20
 
 # 记忆相关配置
+SHORT_MEMORY_CLASS = "modules.memory.memory_memory.MemoryMemory"
 # 最多保存多长的记忆
 MEMORY_MAX_LENGTH = 20
+# 记忆到达最大长度时是否压缩，并将压缩结果作为新的记忆
+MEMORY_SUMMARY_ENABLE = True
 MEMORY_SUMMARY_OPENAI_API_KEY = "sk-xxx"
 MEMORY_SUMMARY_OPENAI_MODEL = "gpt-3.5-turbo"
 MEMORY_SUMMARY_OPENAIAPI_BASE = "https://api.openai.com"
+
+# 交互板相关配置
+DASHBOARD_CLASS = "modules.dashboard.simple_dashboard.SimpleDashboard"
+
+# 长期记忆相关配置
+LONG_MEMORY_CLASS = "modules.long_memory.chroma_long_memory.ChromaLongMemory"
 
 # 写代码插件相关配置
 GENERATE_CODE_OPENAI_API_KEY = "sk-xxx"
@@ -70,6 +82,6 @@ SUMMARY_FILE_OPENAI_MODEL = "gpt-3.5-turbo-16k"
 SUMMARY_FILE_OPENAI_API_BASE = "https://api.openai.com"
 
 # 谷歌搜索插件相关配置
-GOOGLE_SEARCH_ENABLE = True
+GOOGLE_SEARCH_ENABLE = False
 GOOGLE_SEARCH_API_KEY = "xxx"
 GOOGLE_SEARCH_CX = "xxx"

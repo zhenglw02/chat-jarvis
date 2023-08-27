@@ -17,18 +17,19 @@ class OpenAIBrain(AbstractBrain):
         self._client = None
 
         self._functions = None
+        self._system = None
         self._memory = None
 
     def init(self, logger: logging.Logger, functions: list, memory: AbstractMemory):
         self._logger = logger
         self._functions = functions
         self._memory = memory
-        self._memory.save(ChatItem.new("system", system_config.BRAIN_OPENAI_SYSTEM_PROMPT))
+        self._system = ChatItem.new("system", system_config.BRAIN_OPENAI_SYSTEM_PROMPT)
 
     def handle_request(self, chat_item: ChatItem, result_callback: callable):
         self._memory.save(chat_item)
         chat_items = self._memory.load_recent()
-        messages = []
+        messages = [chat_item_to_message(self._system)]
         for item in chat_items:
             messages.append(chat_item_to_message(item))
         self._logger.debug("chat with messages: {}".format(messages))

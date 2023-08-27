@@ -6,12 +6,7 @@ import importlib
 import plugin
 from plugin.plugin_interface import AbstractPlugin
 import abc
-from modules.ear.baidu_ear import BaiduEar
-from modules.mouth.baidu_mouth import BaiduMouth
-from modules.brain.openai_brain import OpenAIBrain
-from modules.dashboard.simple_dashboard import SimpleDashboard
-from modules.memory.memory_memory import MemoryMemory
-from modules.long_memory.chroma_long_memory import ChromaLongMemory
+from config import system_config
 
 
 def load(logger: logging.Logger):
@@ -51,23 +46,34 @@ def load(logger: logging.Logger):
 
     jarvis.init(logger, function_map)
 
-    # todo 支持配置所有组件的实现类
-    jarvis.mouth = BaiduMouth()
+    mouth_class = _get_class(system_config.MOUTH_CLASS)
+    jarvis.mouth = mouth_class()
     jarvis.mouth.init(logger)
 
-    jarvis.ear = BaiduEar()
+    ear_class = _get_class(system_config.EAR_CLASS)
+    jarvis.ear = ear_class()
     jarvis.ear.init(logger)
 
-    jarvis.memory = MemoryMemory()
+    short_memory_class = _get_class(system_config.SHORT_MEMORY_CLASS)
+    jarvis.memory = short_memory_class()
     jarvis.memory.init(logger)
 
-    jarvis.brain = OpenAIBrain()
+    brain_class = _get_class(system_config.BRAIN_CLASS)
+    jarvis.brain = brain_class()
     jarvis.brain.init(logger, functions, jarvis.memory)
 
-    jarvis.dashboard = SimpleDashboard()
+    dashboard_class = _get_class(system_config.DASHBOARD_CLASS)
+    jarvis.dashboard = dashboard_class()
     jarvis.dashboard.init(logger)
 
-    jarvis.long_memory = ChromaLongMemory()
+    long_memory_class = _get_class(system_config.LONG_MEMORY_CLASS)
+    jarvis.long_memory = long_memory_class()
     jarvis.long_memory.init(logger)
 
     return jarvis
+
+
+def _get_class(class_path: str):
+    module_name, class_name = class_path.rsplit('.', 1)
+    module = importlib.import_module(module_name)
+    return getattr(module, class_name)
