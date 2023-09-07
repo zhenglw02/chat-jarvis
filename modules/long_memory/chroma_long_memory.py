@@ -16,8 +16,9 @@ class ChromaLongMemory(AbstractLongMemory):
         self._logger = logger
 
         openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-            api_key=system_config.BRAIN_OPENAI_API_KEY,  # Replace with your own OpenAI API key
-            model_name="text-embedding-ada-002"
+            api_key=system_config.LONG_MEMORY_OPENAI_API_KEY,  # Replace with your own OpenAI API key
+            api_base=system_config.LONG_MEMORY_OPENAI_API_BASE,
+            model_name=system_config.LONG_MEMORY_OPENAI_MODEL
         )
         # Create a new Chroma client with persistence enabled.
         persist_directory = os.path.join(os.path.split(os.path.abspath(__file__))[0], "../../",
@@ -35,14 +36,27 @@ class ChromaLongMemory(AbstractLongMemory):
         self._logger.info("init chroma succeed")
 
     def save(self, items: [LongMemoryItem]):
+        if items is None or len(items) == 0:
+            return
+
         documents = []
         metadatas = []
         ids = []
 
+        to_delete_ids = []
         for item in items:
+            # 从记忆中检索相似的内容，删掉旧的，保留新的，避免保存过多重复记忆
+            old_memories = self.search(text=item.content, n_results=5)
+            for old_memory in old_memories:
+                if old_memory.distance < 0.2:
+                    to_delete_ids.append(old_memory.id)
+                else:
+                    break
             documents.append(item.content)
             metadatas.append(item.metadata)
             ids.append(item.id)
+
+        self.delete(to_delete_ids)
         self._collection.add(
             documents=documents,
             metadatas=metadatas,  # filter on these!
@@ -74,18 +88,7 @@ class ChromaLongMemory(AbstractLongMemory):
                     items[i].distance = v[0][i]
         return items
 
-
-if __name__ == "__main__":
-    logger = logging.getLogger()
-
-    m = ChromaLongMemory()
-    m.init(logger)
-
-    # i1 = LongMemoryItem.new(content="我喜欢吃鱼", metadata={"a": "b"}, id="id1")
-    # i2 = LongMemoryItem.new(content="今天天气很好", metadata={"a": "b"}, id="id2")
-    # i3 = LongMemoryItem.new(content="我叫郑利伟", metadata={"a": "b"}, id="id3")
-
-    # m.save([i1, i2, i3])
-
-    r = m.search("你应该叫我什么？", n_results=1)
-    print("content: {}, distance: {}".format(r[0].content, r[0].distance))
+    def delete(self, ids: list):
+        if ids is None or len(ids) == 0:
+            return
+        self._collection.delete(ids=ids)

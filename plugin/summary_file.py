@@ -1,5 +1,4 @@
 import logging
-import os
 import openai
 
 from config import system_config
@@ -36,14 +35,15 @@ class SummaryFilePlugin(AbstractPlugin):
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "要总结的文件路径",
+                    "description": "要总结的文件路径，应该是绝对路径。",
                 }
             },
             "required": ["file_path"],
         }
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
-        with open(os.path.join(system_config.TEMP_DIR_PATH, args.get("file_path")), "r") as f:
+        file_path = args.get("file_path")
+        with open(file_path, "r") as f:
             content = f.read()
         response = openai.ChatCompletion.create(
             model=system_config.SUMMARY_FILE_OPENAI_MODEL,

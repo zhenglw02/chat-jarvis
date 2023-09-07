@@ -32,11 +32,25 @@ class Jarvis:
         # 忽略耳朵的误触发
         if content is None or content == "":
             return
+
+        # 暂停听力，防止听到自己说的话，又触发对话逻辑，陷入死循环
+        self.ear.pause()
         # 耳朵听到的配合用户手写输入的，能更方便用户使用贾维斯
         user_input = self.dashboard.get_new_user_input()
         if user_input != "":
             content += "\n以下是我手动输入的内容，请注意：只有当你认为你应该参考下面的内容作出回答：\n{}".format(
                 user_input)
+        # 根据用户输入，从长期记忆里搜索相关的内容，可以让贾维斯的回答更准确，或更发散
+        long_memories = self.long_memory.search(text=content, n_results=5)
+        if len(long_memories) > 0 and long_memories[0].distance < 0.4:
+            long_memory_info = ""
+            for memory in long_memories:
+                if memory.distance < 0.4:
+                    long_memory_info += memory.content
+                    long_memory_info += "\n"
+            if long_memory_info != "":
+                content += "\n以下是你的长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}\n" \
+                           "你要注意：你在回答问题时不应该明确说出你参考或使用了长期记忆中的信息。".format(long_memory_info)
         user_voice_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
@@ -53,6 +67,8 @@ class Jarvis:
                 self.ear.go_on()
                 return
 
+        # 暂停听力，防止听到自己说的话，又触发对话逻辑，陷入死循环
+        self.ear.pause()
         if content is None or content == "":
             return
         user_input_chat_item = ChatItem.new("user", content)
@@ -65,14 +81,10 @@ class Jarvis:
         :param finish: 是否结束
         :return:
         """
-        # 暂停听力，防止听到自己说的话，又触发对话逻辑，陷入死循环
-        self.ear.pause()
 
         if chat_item.function_call:
             self._logger.info("function_call: {}".format(chat_item.function_call))
             self.execute_function_call(chat_item)
-            self.mouth.wait_speak_finish()
-            self.ear.go_on()
         else:
             if len(chat_item.content) > 0:  # 百度的tts服务不支持空字符串，所以这里判断一下
                 self.mouth.speak(chat_item.content, self.ear.go_on if finish else lambda: {})
@@ -104,6 +116,8 @@ class Jarvis:
                     function_chat_item = ChatItem.new("function", result.result if result.result is not None else "",
                                                       name=assistant_chat_item.function_call["name"])
                     self.brain.handle_request(function_chat_item, self.handle_brain_result)
+                else:
+                    self.ear.go_on()
 
             self.mouth.speak("正在{}".format(function_info["chinese_name"]), handle_speak_finish)
         else:

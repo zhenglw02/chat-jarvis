@@ -1,7 +1,4 @@
 import logging
-import os
-
-from config import system_config
 
 from plugin.plugin_interface import AbstractPlugin, PluginResult
 from jarvis.jarvis import Jarvis
@@ -32,18 +29,14 @@ class ReadFilePlugin(AbstractPlugin):
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "要读取的文件路径",
+                    "description": "要读取的文件路径，应该是绝对路径。",
                 }
             },
             "required": ["file_path"],
         }
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
-        file_path = os.path.join(system_config.TEMP_DIR_PATH, args.get("file_path"))
-        if not os.path.exists(file_path):
-            # 用户可能手动输入文件的绝对路径给大脑，让他分析，所以这里兼容一下文件不在temp目录下的情况
-            file_path = args.get("file_path")
-
+        file_path = args.get("file_path")
         with open(file_path, "r") as f:
             content = f.read()
         return PluginResult.new(result="文件内容如下：\n{}".format(content), need_call_brain=True)

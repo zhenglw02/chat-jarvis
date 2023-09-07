@@ -71,11 +71,14 @@ class DownloadURLPlugin(AbstractPlugin):
             # 找到页面中的所有文本内容
             text_content = soup.get_text()
             file_name = "download_url-{}.txt".format(str(int(time.time())))
-            with open(os.path.join(system_config.TEMP_DIR_PATH, file_name), "w") as f:
+            file_path = os.path.abspath(os.path.join(system_config.TEMP_DIR_PATH, file_name))
+            with open(file_path, "w") as f:
                 f.write(text_content)
 
         finally:
             # 关闭浏览器
             driver.quit()
 
-        return PluginResult.new(result=f"我以将该网页的内容下载到文件【{file_name}】中", need_call_brain=True)
+        return PluginResult.new(
+            result=f"我以将该网页的内容下载到文件【{file_path}】中。你应该尽量使用【提取摘要】接口提取网页内容的摘要，再根据摘要内容回答用户的问题。",
+            need_call_brain=True)

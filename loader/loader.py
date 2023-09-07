@@ -54,9 +54,13 @@ def load(logger: logging.Logger):
     jarvis.ear = ear_class()
     jarvis.ear.init(logger)
 
+    long_memory_class = _get_class(system_config.LONG_MEMORY_CLASS)
+    jarvis.long_memory = long_memory_class()
+    jarvis.long_memory.init(logger)
+
     short_memory_class = _get_class(system_config.SHORT_MEMORY_CLASS)
     jarvis.memory = short_memory_class()
-    jarvis.memory.init(logger)
+    jarvis.memory.init(logger, jarvis.long_memory)
 
     brain_class = _get_class(system_config.BRAIN_CLASS)
     jarvis.brain = brain_class()
@@ -65,10 +69,6 @@ def load(logger: logging.Logger):
     dashboard_class = _get_class(system_config.DASHBOARD_CLASS)
     jarvis.dashboard = dashboard_class()
     jarvis.dashboard.init(logger)
-
-    long_memory_class = _get_class(system_config.LONG_MEMORY_CLASS)
-    jarvis.long_memory = long_memory_class()
-    jarvis.long_memory.init(logger)
 
     return jarvis
 

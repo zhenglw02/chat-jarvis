@@ -55,8 +55,9 @@ class GenerateCodePlugin(AbstractPlugin):
         message = response.choices[0].message
         self._logger.debug("code gen result: \n{}\n".format(message.content))
         file_name = f"generate_code-{str(int(time.time()))}.md"
-        with open(os.path.join(system_config.TEMP_DIR_PATH, file_name), "w") as f:
+        file_path = os.path.abspath(os.path.join(system_config.TEMP_DIR_PATH, file_name))
+        with open(file_path, "w") as f:
             f.write(message.content)
         return PluginResult.new(
-            result=f"已经将代码生成到文件【{file_name}】中，你应该倾向于使用展示文件插件将代码文件展示给我，除非我明确要求使用其他方式将代码文件给我。",
+            result=f"已经将代码生成到文件【{file_path}】中，你应该倾向于使用展示文件插件将代码文件展示给我，除非我明确要求使用其他方式将代码文件给我。",
             need_call_brain=True)
