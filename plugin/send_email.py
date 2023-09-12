@@ -46,7 +46,7 @@ class SendEmailPlugin(AbstractPlugin):
                 },
                 "attachment_path": {
                     "type": "string",
-                    "description": "邮件附件文件地址，只有当需要添加附件时才需要传该参数。",
+                    "description": "邮件附件文件地址，如果你需要将生成的文件通过邮件发送出去，你应该使用本字段。",
                 },
             },
             "required": ["receiver_email", "subject", "message"],

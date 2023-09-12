@@ -35,5 +35,16 @@ class GetDatetimePlugin(AbstractPlugin):
 
     def run(self, jarvis: Jarvis, args: dict) -> PluginResult:
         now = datetime.datetime.now()
-        result = "今天是{}年{}月{}日{}时{}分{}秒".format(now.year, now.month, now.day, now.hour, now.minute, now.second)
+        weekday = now.date().weekday()
+        weekday_chinese_map = {
+            0: "星期一",
+            1: "星期二",
+            2: "星期三",
+            3: "星期四",
+            4: "星期五",
+            5: "星期六",
+            6: "星期日",
+        }
+        result = "现在是{}年{}月{}日{}时{}分{}秒，{}".format(now.year, now.month, now.day, now.hour, now.minute,
+                                                          now.second, weekday_chinese_map.get(weekday))
         return PluginResult.new(result=result, need_call_brain=True)

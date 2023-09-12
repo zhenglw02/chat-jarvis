@@ -80,5 +80,5 @@ class DownloadURLPlugin(AbstractPlugin):
             driver.quit()
 
         return PluginResult.new(
-            result=f"我以将该网页的内容下载到文件【{file_path}】中。你应该尽量使用【提取摘要】接口提取网页内容的摘要，再根据摘要内容回答用户的问题。",
+            result=f"我以将该网页的内容下载到文件【{file_path}】中。你应该优先考虑使用【文档问答】接口直接进行特定问题的问答。",
             need_call_brain=True)

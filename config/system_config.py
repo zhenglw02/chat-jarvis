@@ -73,6 +73,10 @@ LONG_MEMORY_CLASS = "modules.long_memory.chroma_long_memory.ChromaLongMemory"
 LONG_MEMORY_OPENAI_API_KEY = "sk-xxx"
 LONG_MEMORY_OPENAI_API_BASE = "https://api.openai.com"
 LONG_MEMORY_OPENAI_MODEL = "text-embedding-ada-002"
+# 针对用户说的话，从长期记忆中搜索时使用的距离阈值，0 - 1之间，值越大，表示记忆内容与用户说的话相关性越小
+LONG_MEMORY_FILTER_DISTANCE = 0.5
+# 从长期记忆中搜索的记录条数
+LONG_MEMORY_SEARCH_COUNT = 5
 
 # 写代码插件相关配置
 GENERATE_CODE_OPENAI_API_KEY = "sk-xxx"
@@ -90,6 +94,6 @@ GOOGLE_SEARCH_API_KEY = "xxx"
 GOOGLE_SEARCH_CX = "xxx"
 
 # 发送邮件插件相关配置
-EMAIL_SENDER_EMAIL = "chat_jarvis@163.com"
+EMAIL_SENDER_EMAIL = "xxx@xxx.com"
 EMAIL_SENDER_PASSWORD = "xxx"
-EMAIL_SMTP_HOST = "smtp.163.com"
+EMAIL_SMTP_HOST = "smtp.xxx.com"

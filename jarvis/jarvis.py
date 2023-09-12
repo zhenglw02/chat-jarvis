@@ -2,6 +2,7 @@ import json
 from json.decoder import JSONDecodeError
 
 from modules.brain.brain_interface import ChatItem
+from config import system_config
 
 
 class Jarvis:
@@ -41,16 +42,16 @@ class Jarvis:
             content += "\n以下是我手动输入的内容，请注意：只有当你认为你应该参考下面的内容作出回答：\n{}".format(
                 user_input)
         # 根据用户输入，从长期记忆里搜索相关的内容，可以让贾维斯的回答更准确，或更发散
-        long_memories = self.long_memory.search(text=content, n_results=5)
-        if len(long_memories) > 0 and long_memories[0].distance < 0.4:
+        long_memories = self.long_memory.search(text=content, n_results=system_config.LONG_MEMORY_SEARCH_COUNT)
+        if len(long_memories) > 0 and long_memories[0].distance < system_config.LONG_MEMORY_FILTER_DISTANCE:
             long_memory_info = ""
             for memory in long_memories:
-                if memory.distance < 0.4:
+                if memory.distance < system_config.LONG_MEMORY_FILTER_DISTANCE:
                     long_memory_info += memory.content
                     long_memory_info += "\n"
             if long_memory_info != "":
-                content += "\n以下是你的长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}\n" \
-                           "你要注意：你在回答问题时不应该明确说出你参考或使用了长期记忆中的信息。".format(long_memory_info)
+                content += "\n以下是【你的】长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}".format(
+                    long_memory_info)
         user_voice_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
@@ -64,6 +65,7 @@ class Jarvis:
         if action is not None and action != "":
             if action == "shutup":
                 self.mouth.shutup()
+                self.mouth.wait_speak_finish()
                 self.ear.go_on()
                 return
 
@@ -71,6 +73,18 @@ class Jarvis:
         self.ear.pause()
         if content is None or content == "":
             return
+
+        # 根据用户输入，从长期记忆里搜索相关的内容，可以让贾维斯的回答更准确，或更发散
+        long_memories = self.long_memory.search(text=content, n_results=system_config.LONG_MEMORY_SEARCH_COUNT)
+        if len(long_memories) > 0 and long_memories[0].distance < system_config.LONG_MEMORY_FILTER_DISTANCE:
+            long_memory_info = ""
+            for memory in long_memories:
+                if memory.distance < system_config.LONG_MEMORY_FILTER_DISTANCE:
+                    long_memory_info += memory.content
+                    long_memory_info += "\n"
+            if long_memory_info != "":
+                content += "\n以下是你的长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}".format(
+                    long_memory_info)
         user_input_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_input_chat_item, self.handle_brain_result)
 
@@ -117,8 +131,9 @@ class Jarvis:
                                                       name=assistant_chat_item.function_call["name"])
                     self.brain.handle_request(function_chat_item, self.handle_brain_result)
                 else:
+                    self.mouth.wait_speak_finish()
                     self.ear.go_on()
 
             self.mouth.speak("正在{}".format(function_info["chinese_name"]), handle_speak_finish)
         else:
-            self.mouth.speak("未知的程序名称：{}".format(assistant_chat_item.function_call["name"]), lambda: {})
+            self.mouth.speak("未知的程序名称：{}".format(assistant_chat_item.function_call["name"]), self.ear.go_on())
