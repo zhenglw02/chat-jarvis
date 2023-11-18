@@ -54,6 +54,10 @@ def load(logger: logging.Logger):
     jarvis.ear = ear_class()
     jarvis.ear.init(logger)
 
+    eye_class = _get_class(system_config.EYE_CLASS)
+    jarvis.eye = eye_class()
+    jarvis.eye.init(logger)
+
     long_memory_class = _get_class(system_config.LONG_MEMORY_CLASS)
     jarvis.long_memory = long_memory_class()
     jarvis.long_memory.init(logger)

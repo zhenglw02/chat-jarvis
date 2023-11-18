@@ -60,7 +60,7 @@ class MemoryMemory(AbstractMemory):
         history = ""
         for message in self._messages[1:]:
             history += "【{}】：{}\n".format(message.role, message.content)
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model=system_config.MEMORY_SUMMARY_OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": "你是一个优秀的管家，我是你的主人."},

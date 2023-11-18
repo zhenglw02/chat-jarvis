@@ -15,11 +15,11 @@ class ChromaLongMemory(AbstractLongMemory):
     def init(self, logger: logging.Logger):
         self._logger = logger
 
-        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-            api_key=system_config.LONG_MEMORY_OPENAI_API_KEY,  # Replace with your own OpenAI API key
-            api_base=system_config.LONG_MEMORY_OPENAI_API_BASE,
-            model_name=system_config.LONG_MEMORY_OPENAI_MODEL
-        )
+        # openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+        #     api_key=system_config.LONG_MEMORY_OPENAI_API_KEY,  # Replace with your own OpenAI API key
+        #     api_base=system_config.LONG_MEMORY_OPENAI_API_BASE,
+        #     model_name=system_config.LONG_MEMORY_OPENAI_MODEL
+        # )
         # Create a new Chroma client with persistence enabled.
         persist_directory = os.path.join(os.path.split(os.path.abspath(__file__))[0], "../../",
                                          system_config.SYSTEM_DATA_PATH, "long_memory")
@@ -28,7 +28,7 @@ class ChromaLongMemory(AbstractLongMemory):
 
         # Create a new chroma collection
         collection_name = "long_memory_collection"
-        self._collection = client.get_or_create_collection(name=collection_name, embedding_function=openai_ef)
+        self._collection = client.get_or_create_collection(name=collection_name)
 
         # 如果是第一次运行，通过调一下search，让chroma加载一下依赖的模型文件
         self._logger.info("init chroma...")

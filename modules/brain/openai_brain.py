@@ -1,9 +1,10 @@
 import logging
 import openai
+from openai import RateLimitError
+
 from config import system_config
 from modules.brain.brain_interface import AbstractBrain
 from modules.memory.memory_interface import AbstractMemory
-from openai.error import RateLimitError
 from modules.brain.util import has_break_char
 from modules.model.chat_item import ChatItem
 
@@ -34,7 +35,7 @@ class OpenAIBrain(AbstractBrain):
             messages.append(chat_item_to_message(item))
         self._logger.debug("chat with messages: {}".format(messages))
         try:
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model=system_config.BRAIN_OPENAI_MODEL,
                 messages=messages,
                 functions=self._functions,
@@ -45,15 +46,15 @@ class OpenAIBrain(AbstractBrain):
             total_content = ""
             temp_content = ""
             for chunk in response:
-                chunk_message = chunk['choices'][0]['delta']  # extract the message
+                chunk_message = chunk.choices[0].delta  # extract the message
                 collected_messages.append(chunk_message)  # save the message
-                if len(collected_messages) == 1 and 'function_call' in chunk_message:
+                if len(collected_messages) == 1 and chunk_message.function_call is not None:
                     is_function_call = True
 
-                if not is_function_call and 'content' in chunk_message:
-                    total_content += chunk_message['content']
-                    temp_content += chunk_message['content']
-                    if has_break_char(chunk_message['content']) and len(
+                if not is_function_call and chunk_message.content is not None and chunk_message.content != '':
+                    total_content += chunk_message.content
+                    temp_content += chunk_message.content
+                    if has_break_char(chunk_message.content) and len(
                             temp_content) >= system_config.START_SPEAK_CONTENT_LENGTH:
                         result_callback(ChatItem.new("assistant", temp_content), False)
                         temp_content = ""
@@ -90,15 +91,15 @@ def merge_collected_messages(collected_messages, is_function_call) -> ChatItem:
     if is_function_call:
         total_chat_item.content = None
         total_chat_item.function_call = {
-            "name": collected_messages[0]["function_call"]["name"],
+            "name": collected_messages[0].function_call.name,
             "arguments": "",
         }
 
     # 最后一个是空的
     for m in collected_messages[:len(collected_messages) - 1]:
         if is_function_call:
-            total_chat_item.function_call["arguments"] += m["function_call"]["arguments"]
+            total_chat_item.function_call["arguments"] += m.function_call.arguments
         else:
-            total_chat_item.content += m["content"]
+            total_chat_item.content += m.content
 
     return total_chat_item

@@ -12,6 +12,7 @@ class Jarvis:
         self.long_memory = None
         self.brain = None
         self.ear = None
+        self.eye = None
         self.dashboard = None
         self._logger = None
         self._function_map = None
@@ -52,6 +53,14 @@ class Jarvis:
             if long_memory_info != "":
                 content += "\n以下是【你的】长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}".format(
                     long_memory_info)
+
+        # 如果打开了眼睛，可以从眼睛中获取信息
+        if self.eye.enabled():
+            image_info = self.eye.parse_snapshot()
+            if image_info is not None and image_info != "":
+                content += (f"\n以下是你从眼睛中获取的部分视觉信息，你可以参考这些信息作出回答：\n{image_info}\n"
+                            f"请注意：只有当下面的问题与视觉信息有关时，你才能参开这些信息，否则，你应该忽略这些内容。")
+
         user_voice_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_voice_chat_item, self.handle_brain_result)
 
@@ -85,6 +94,14 @@ class Jarvis:
             if long_memory_info != "":
                 content += "\n以下是你的长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}".format(
                     long_memory_info)
+
+        # 如果打开了眼睛，可以从眼睛中获取信息
+        if self.eye.enabled():
+            image_info = self.eye.parse_snapshot()
+            if image_info is not None and image_info != "":
+                content += (f"\n以下是你从眼睛中获取的部分视觉信息，你可以参考这些信息作出回答：\n{image_info}\n"
+                            f"请注意：只有当下面的问题与视觉信息有关时，你才能参开这些信息，否则，你应该忽略这些内容。")
+
         user_input_chat_item = ChatItem.new("user", content)
         self.brain.handle_request(user_input_chat_item, self.handle_brain_result)
 

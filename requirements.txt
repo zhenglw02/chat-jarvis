@@ -1,8 +1,8 @@
 selenium~=4.10.0
 beautifulsoup4~=4.12.2
-openai~=0.27.8
-websocket~=0.2.1
-websocket-client~=1.6.1
+openai=1.1.1
+websocket=0.2.1
+websocket-client=1.6.1
 PyAudio~=0.2.13
 pygame~=2.5.0
 baidu-aip~=4.16.11
