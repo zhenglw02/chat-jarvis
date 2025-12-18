@@ -35,11 +35,16 @@ def load(logger: logging.Logger):
                 continue
             obj.init(logger)
             function_map[obj.get_name()] = {"chinese_name": obj.get_chinese_name(), "function": obj.run}
-            functions.append({
-                "name": obj.get_name(),
-                "description": obj.get_description(),
-                "parameters": obj.get_parameters()
-            })
+            functions.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": obj.get_name(),
+                        "description": obj.get_description(),
+                        "parameters": obj.get_parameters(),
+                    },
+                }
+            )
 
     logger.info("function_map: {}\n".format(function_map))
     logger.info("functions: {}\n".format(functions))

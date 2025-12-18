@@ -2,3 +2,5 @@ temp/*
 system_data
 __pycache__
 .idea
+config/system_config.py
+.venv

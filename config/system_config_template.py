@@ -28,8 +28,8 @@ BAIDU_EAR_SECRET_KEY = "xxx"
 BAIDU_EAR_PER_REQUEST_THRESHOLD_IN_SECOND = 1.0
 
 # 嘴巴相关配置
-MOUTH_CLASS = "modules.mouth.openai_mouth.OpenAIMouth"
-OPENAI_MOUTH_API_KEY = "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"
+MOUTH_CLASS = "modules.mouth.baidu_mouth.BaiduMouth"
+OPENAI_MOUTH_API_KEY = "sk-xxx"
 OPENAI_MOUTH_API_BASE = "https://api.openai.com"
 BAIDU_MOUTH_APP_ID = "0"
 # 百度鉴权信息
@@ -54,9 +54,9 @@ BAIDU_EYE_IMAGE_SECRET_KEY = "xxx"
 # 大脑相关配置
 BRAIN_CLASS = "modules.brain.openai_brain.OpenAIBrain"
 # 使用的openai模型
-BRAIN_OPENAI_MODEL = "gpt-3.5-turbo"
+BRAIN_OPENAI_MODEL = "qwen2.5-72b-instruct"
 BRAIN_OPENAI_API_KEY = "sk-xxx"
-BRAIN_OPENAI_API_BASE = "https://api.openai.com"
+BRAIN_OPENAI_API_BASE = "http://host:port/v1"
 BRAIN_OPENAI_SYSTEM_PROMPT = f"你是一个人工智能管家，你的名字是{AI_NAME}。你本质上是我编写的一个程序，但你在和我交流时表现为一个专业的管家。\n" \
                 f"你有耳朵，可以听到我说的话；你有嘴巴，可以说话；你有眼睛，可以从眼睛中获得关于我的图像信息；你有一个交互板，可以通过交互板获取我手动输入的文字；你拥有一个外部存储，用于实现长期记忆能力。\n" \
                 f"你有很多额外能力可以通过函数调用的方式使用，你应该注重函数的使用。\n" \
@@ -73,8 +73,8 @@ MEMORY_MAX_LENGTH = 20
 # 记忆到达最大长度时是否压缩，并将压缩结果作为新的记忆
 MEMORY_SUMMARY_ENABLE = True
 MEMORY_SUMMARY_OPENAI_API_KEY = "sk-xxx"
-MEMORY_SUMMARY_OPENAI_MODEL = "gpt-3.5-turbo"
-MEMORY_SUMMARY_OPENAI_API_BASE = "https://api.openai.com"
+MEMORY_SUMMARY_OPENAI_MODEL = "qwen2.5-72b-instruct"
+MEMORY_SUMMARY_OPENAI_API_BASE = "http://host:port/v1"
 
 # 交互板相关配置
 DASHBOARD_CLASS = "modules.dashboard.simple_dashboard.SimpleDashboard"
@@ -85,7 +85,7 @@ LONG_MEMORY_OPENAI_API_KEY = "sk-xxx"
 LONG_MEMORY_OPENAI_API_BASE = "https://api.openai.com"
 LONG_MEMORY_OPENAI_MODEL = "text-embedding-ada-002"
 # 针对用户说的话，从长期记忆中搜索时使用的距离阈值，0 - 1之间，值越大，表示记忆内容与用户说的话相关性越小
-LONG_MEMORY_FILTER_DISTANCE = 0.5
+LONG_MEMORY_FILTER_DISTANCE = 1.5
 # 从长期记忆中搜索的记录条数
 LONG_MEMORY_SEARCH_COUNT = 5
 

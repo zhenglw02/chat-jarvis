@@ -8,8 +8,8 @@ from modules.memory.memory_interface import AbstractMemory
 from modules.brain.util import has_break_char
 from modules.model.chat_item import ChatItem
 
-openai.api_key = system_config.BRAIN_OPENAI_API_KEY
-openai.api_base = system_config.BRAIN_OPENAI_API_BASE
+# openai.api_key = system_config.BRAIN_OPENAI_API_KEY
+# openai.api_base = system_config.BRAIN_OPENAI_API_BASE
 
 
 class OpenAIBrain(AbstractBrain):
@@ -26,6 +26,7 @@ class OpenAIBrain(AbstractBrain):
         self._functions = functions
         self._memory = memory
         self._system = ChatItem.new("system", system_config.BRAIN_OPENAI_SYSTEM_PROMPT)
+        self._client = openai.Client(base_url=system_config.BRAIN_OPENAI_API_BASE, api_key=system_config.BRAIN_OPENAI_API_KEY)
 
     def handle_request(self, chat_item: ChatItem, result_callback: callable):
         self._memory.save(chat_item)
@@ -35,23 +36,28 @@ class OpenAIBrain(AbstractBrain):
             messages.append(chat_item_to_message(item))
         self._logger.debug("chat with messages: {}".format(messages))
         try:
-            response = openai.chat.completions.create(
+            response = self._client.chat.completions.create(
                 model=system_config.BRAIN_OPENAI_MODEL,
                 messages=messages,
-                functions=self._functions,
+                tools=self._functions,
                 stream=True,
             )
             is_function_call = False
-            collected_messages = []
             total_content = ""
             temp_content = ""
+            function_call_name = None
+            function_call_arguments = ""
             for chunk in response:
                 chunk_message = chunk.choices[0].delta  # extract the message
-                collected_messages.append(chunk_message)  # save the message
-                if len(collected_messages) == 1 and chunk_message.function_call is not None:
+                if chunk_message.tool_calls:
                     is_function_call = True
+                    tool_call = chunk_message.tool_calls[0]
+                    if tool_call.function.name:
+                        function_call_name = tool_call.function.name
+                    if tool_call.function.arguments:
+                        function_call_arguments += tool_call.function.arguments
 
-                if not is_function_call and chunk_message.content is not None and chunk_message.content != '':
+                if chunk_message.content:
                     total_content += chunk_message.content
                     temp_content += chunk_message.content
                     if has_break_char(chunk_message.content) and len(
@@ -59,7 +65,14 @@ class OpenAIBrain(AbstractBrain):
                         result_callback(ChatItem.new("assistant", temp_content), False)
                         temp_content = ""
 
-            total_chat_item = merge_collected_messages(collected_messages, is_function_call)
+            if is_function_call:
+                total_chat_item = ChatItem.new(
+                    "assistant",
+                    None,
+                    {"name": function_call_name or "", "arguments": function_call_arguments},
+                )
+            else:
+                total_chat_item = ChatItem.new("assistant", total_content)
             self._memory.save(total_chat_item)
             if is_function_call:
                 result_callback(total_chat_item, True)
@@ -84,22 +97,3 @@ def chat_item_to_message(chat_item: ChatItem) -> dict:
     if chat_item.function_call is not None:
         message["function_call"] = chat_item.function_call
     return message
-
-
-def merge_collected_messages(collected_messages, is_function_call) -> ChatItem:
-    total_chat_item = ChatItem.new("assistant", "")
-    if is_function_call:
-        total_chat_item.content = None
-        total_chat_item.function_call = {
-            "name": collected_messages[0].function_call.name,
-            "arguments": "",
-        }
-
-    # 最后一个是空的
-    for m in collected_messages[:len(collected_messages) - 1]:
-        if is_function_call:
-            total_chat_item.function_call["arguments"] += m.function_call.arguments
-        else:
-            total_chat_item.content += m.content
-
-    return total_chat_item

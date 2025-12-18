@@ -31,8 +31,8 @@ OpenAI的账号申请和API访问需要你自行准备（懂的都懂）。
 
 ```
 cd chat-jarvis
-python3 -m venv ./venv
-source ./venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 3. 安装系统依赖，由于使用到了录音、展示窗口等功能，需要安装相关组件
@@ -42,6 +42,7 @@ source ./venv/bin/activate
 sudo apt-get install -y python3-pyaudio python3-tk portaudio19-dev alsa-utils
 # mac系统
 brew install portaudio
+brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx portmidi freetype2
 ```
 
 

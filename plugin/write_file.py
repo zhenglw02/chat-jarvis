@@ -10,7 +10,7 @@ from jarvis.jarvis import Jarvis
 
 class WriteFilePlugin(AbstractPlugin):
     def valid(self) -> bool:
-        return True
+        return False
 
     def __init__(self):
         self._logger = None

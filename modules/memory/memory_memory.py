@@ -10,9 +10,6 @@ from modules.model.chat_item import ChatItem
 from modules.long_memory.long_memory_interface import AbstractLongMemory
 from modules.long_memory.long_memory_interface import LongMemoryItem
 
-openai.api_key = system_config.MEMORY_SUMMARY_OPENAI_API_KEY
-openai.api_base = system_config.MEMORY_SUMMARY_OPENAI_API_BASE
-
 
 class MemoryMemory(AbstractMemory):
     def __init__(self):
@@ -60,16 +57,22 @@ class MemoryMemory(AbstractMemory):
         history = ""
         for message in self._messages[1:]:
             history += "【{}】：{}\n".format(message.role, message.content)
-        response = openai.chat.completions.create(
+        response = openai.Client(
+            base_url=system_config.MEMORY_SUMMARY_OPENAI_API_BASE,
+            api_key=system_config.MEMORY_SUMMARY_OPENAI_API_KEY,
+        ).chat.completions.create(
             model=system_config.MEMORY_SUMMARY_OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": "你是一个优秀的管家，我是你的主人."},
-                {"role": "user", "content": "你的任务是从下面的【对话内容】中提取你需要长期记住的信息，主要是关于我的个人喜好，生活习惯等管家需要记住的内容，以及我要求你记住的其他内容。\n"
-                                            "【对话内容】:\n{}\n"
-                                            "你应该按照json列表的形式输出需要长期记住的信息，下面是一个示例：\n"
-                                            "[\"用户的名字是liwei。\", \"用户的出生年份是1997年。\", \"用户要求管家记住以后说话要简洁一点。\"]\n"
-                                            "如果上面的【对话内容】中没有需要长期记住的信息，你应该返回空列表：[]\n"
-                                            "你应该直接返回文字内容，不能进行函数调用。".format(history)}
+                {
+                    "role": "user",
+                    "content": "你的任务是从下面的【对话内容】中提取你需要长期记住的信息，主要是关于我的个人喜好，生活习惯等管家需要记住的内容，以及我要求你记住的其他内容。\n"
+                    "【对话内容】:\n{}\n"
+                    "你应该按照json列表的形式输出需要长期记住的信息，下面是一个示例：\n"
+                    '["用户的名字是liwei。", "用户的出生年份是1997年。", "用户要求管家记住以后说话要简洁一点。"]\n'
+                    "如果上面的【对话内容】中没有需要长期记住的信息，你应该返回空列表：[]\n"
+                    "你应该直接返回文字内容，不能进行函数调用。".format(history),
+                },
             ],
         )
         message = response.choices[0].message

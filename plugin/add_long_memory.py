@@ -9,7 +9,7 @@ from jarvis.jarvis import Jarvis
 class AddLongMemoryPlugin(AbstractPlugin):
     def valid(self) -> bool:
         # 功能不成熟，先不开放
-        return False
+        return True
 
     def __init__(self):
         self._logger = None

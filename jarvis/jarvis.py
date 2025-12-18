@@ -51,7 +51,7 @@ class Jarvis:
                     long_memory_info += memory.content
                     long_memory_info += "\n"
             if long_memory_info != "":
-                content += "\n以下是【你的】长期记忆中的部分信息，你可以参考这些信息作出回答：\n{}".format(
+                content += "\n以下是【你的】长期记忆中的部分信息，你可以参考这些信息作出回答，但如果当前问题与记忆中的信息无关的话，请忽略记忆内容：\n{}".format(
                     long_memory_info)
 
         # 如果打开了眼睛，可以从眼睛中获取信息
@@ -85,6 +85,7 @@ class Jarvis:
 
         # 根据用户输入，从长期记忆里搜索相关的内容，可以让贾维斯的回答更准确，或更发散
         long_memories = self.long_memory.search(text=content, n_results=system_config.LONG_MEMORY_SEARCH_COUNT)
+        print(f"long memory: {long_memories}")
         if len(long_memories) > 0 and long_memories[0].distance < system_config.LONG_MEMORY_FILTER_DISTANCE:
             long_memory_info = ""
             for memory in long_memories:
@@ -135,7 +136,7 @@ class Jarvis:
             def handle_speak_finish():
                 # 校验以下模型生成的调用参数是否合法，一般调show_text()展示代码的时候可能生成的参数不对
                 try:
-                    arguments = json.loads(assistant_chat_item.function_call["arguments"])
+                    arguments = json.loads(assistant_chat_item.function_call["arguments"]) if assistant_chat_item.function_call["arguments"] != "" else {}
                 except JSONDecodeError as e:
                     self._logger.error("json loads arguments failed, arguments: {}, exception: {}".format(
                         assistant_chat_item.function_call["arguments"], e))
