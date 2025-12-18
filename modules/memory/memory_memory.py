@@ -23,7 +23,7 @@ class MemoryMemory(AbstractMemory):
         self._long_memory = long_memory
 
     def save(self, message: ChatItem):
-        self._messages.append(message)
+        self._messages.append(message)            
         if len(self._messages) > system_config.MEMORY_MAX_LENGTH:
             self._logger.debug("memory is max, summary them")
             self._extract_long_memory()

@@ -4,6 +4,10 @@ import logging
 import websocket
 import pyaudio
 
+from recorder import recorder_manager
+from recorder.recorder_interface import RecordItem
+from consts.const import *
+
 import threading
 import time
 import uuid
@@ -196,6 +200,14 @@ class BaiduEar(AbstractEar):
                         self._have_new_voice = False
                         self._sleep = False
 
+                        # 记录耳朵语音转文本的原始结果，里面可能有错别字等问题，先收集起来，后续可以考虑用模型纠正
+                        recorder_manager.get_recorder().record(
+                            RecordItem(
+                                source=RECORD_SOURCE_EAR,
+                                type=RECORD_TYPE_LISTEN_RESULT,
+                                data={"content": self._last_sentence},
+                            )
+                        )
                         self._callback(self._last_sentence)
                 time.sleep(0.1)
 

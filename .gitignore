@@ -4,3 +4,4 @@ __pycache__
 .idea
 config/system_config.py
 .venv
+records

@@ -7,9 +7,9 @@ from modules.brain.brain_interface import AbstractBrain
 from modules.memory.memory_interface import AbstractMemory
 from modules.brain.util import has_break_char
 from modules.model.chat_item import ChatItem
-
-# openai.api_key = system_config.BRAIN_OPENAI_API_KEY
-# openai.api_base = system_config.BRAIN_OPENAI_API_BASE
+from recorder import recorder_manager
+from recorder.recorder_interface import RecordItem
+from consts.const import *
 
 
 class OpenAIBrain(AbstractBrain):
@@ -34,6 +34,9 @@ class OpenAIBrain(AbstractBrain):
         messages = [chat_item_to_message(self._system)]
         for item in chat_items:
             messages.append(chat_item_to_message(item))
+
+        recorder_manager.get_recorder().record(RecordItem(source=RECORD_SOURCE_BRAIN, type=RECORD_TYPE_CHAT_DATA, data=messages))
+
         self._logger.debug("chat with messages: {}".format(messages))
         try:
             response = self._client.chat.completions.create(
@@ -74,6 +77,10 @@ class OpenAIBrain(AbstractBrain):
             else:
                 total_chat_item = ChatItem.new("assistant", total_content)
             self._memory.save(total_chat_item)
+
+            messages.append(chat_item_to_message(total_chat_item))
+            recorder_manager.get_recorder().record(RecordItem(source=RECORD_SOURCE_BRAIN, type=RECORD_TYPE_CHAT_DATA, data=messages))
+
             if is_function_call:
                 result_callback(total_chat_item, True)
             else:  # 即使temp_content为空也要回调，告诉外界已经说完

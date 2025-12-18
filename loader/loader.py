@@ -7,6 +7,7 @@ import plugin
 from plugin.plugin_interface import AbstractPlugin
 import abc
 from config import system_config
+from recorder import recorder_manager
 
 
 def load(logger: logging.Logger):
@@ -78,6 +79,8 @@ def load(logger: logging.Logger):
     dashboard_class = _get_class(system_config.DASHBOARD_CLASS)
     jarvis.dashboard = dashboard_class()
     jarvis.dashboard.init(logger)
+
+    recorder_manager.init_recorder(logger)
 
     return jarvis
 

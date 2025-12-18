@@ -89,6 +89,10 @@ LONG_MEMORY_FILTER_DISTANCE = 1.5
 # 从长期记忆中搜索的记录条数
 LONG_MEMORY_SEARCH_COUNT = 5
 
+# 记录器相关配置
+RECORDER_CLASS = "modules.recorder.disk_recorder.DiskRecorder"
+RECORDER_STORAGE_DIR = "./temp/records"
+
 # 写代码插件相关配置
 GENERATE_CODE_OPENAI_API_KEY = "sk-xxx"
 GENERATE_CODE_OPENAI_MODEL = "gpt-3.5-turbo-0613"
