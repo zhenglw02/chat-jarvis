@@ -32,13 +32,19 @@ class MemoryMemory(AbstractMemory):
                 history = ""
                 for message in self._messages[1:]:
                     history += "【{}】：{}\n".format(message.role, message.content)
-                response = openai.ChatCompletion.create(
+                response = openai.Client(
+                    base_url=system_config.MEMORY_SUMMARY_OPENAI_API_BASE,
+                    api_key=system_config.MEMORY_SUMMARY_OPENAI_API_KEY,
+                ).chat.completions.create(
                     model=system_config.MEMORY_SUMMARY_OPENAI_MODEL,
                     messages=[
                         {"role": "system", "content": "你是一个资深的文字工作者."},
-                        {"role": "user", "content": "你的任务是总结下面的对话内容:\n{}.请按照以下的格式总结上面的对话内容：\n"
-                                                    "【用户和贾维斯正在做的事情】：\n"
-                                                    "【其他内容】：".format(history)}
+                        {
+                            "role": "user",
+                            "content": "你的任务是总结下面的对话内容:\n{}.请按照以下的格式总结上面的对话内容：\n"
+                            "【用户和贾维斯正在做的事情】：\n"
+                            "【其他内容】：".format(history),
+                        },
                     ],
                 )
                 message = response.choices[0].message

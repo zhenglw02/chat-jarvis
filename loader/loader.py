@@ -8,6 +8,7 @@ from plugin.plugin_interface import AbstractPlugin
 import abc
 from config import system_config
 from recorder import recorder_manager
+from self_awake.scheduler import init_scheduler, get_scheduler
 
 
 def load(logger: logging.Logger):
@@ -81,6 +82,8 @@ def load(logger: logging.Logger):
     jarvis.dashboard.init(logger)
 
     recorder_manager.init_recorder(logger)
+    
+    init_scheduler(logger, jarvis)
 
     return jarvis
 

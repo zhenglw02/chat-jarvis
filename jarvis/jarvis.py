@@ -201,3 +201,6 @@ class Jarvis:
                 "未知的程序名称：{}".format(assistant_chat_item.function_call["name"]),
                 self.ear.go_on(),
             )
+
+    def handle_self_awake_request(self, chat_item: ChatItem):
+        self.brain.handle_request(chat_item, self.handle_brain_result)
