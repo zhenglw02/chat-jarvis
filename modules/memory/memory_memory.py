@@ -9,6 +9,9 @@ from modules.memory.memory_interface import AbstractMemory
 from modules.model.chat_item import ChatItem
 from modules.long_memory.long_memory_interface import AbstractLongMemory
 from modules.long_memory.long_memory_interface import LongMemoryItem
+from recorder import recorder_manager
+from recorder.recorder_interface import RecordItem
+from consts.const import *
 
 
 class MemoryMemory(AbstractMemory):
@@ -63,12 +66,8 @@ class MemoryMemory(AbstractMemory):
         history = ""
         for message in self._messages[1:]:
             history += "【{}】：{}\n".format(message.role, message.content)
-        response = openai.Client(
-            base_url=system_config.MEMORY_SUMMARY_OPENAI_API_BASE,
-            api_key=system_config.MEMORY_SUMMARY_OPENAI_API_KEY,
-        ).chat.completions.create(
-            model=system_config.MEMORY_SUMMARY_OPENAI_MODEL,
-            messages=[
+
+        messages = [
                 {"role": "system", "content": "你是一个优秀的管家，我是你的主人."},
                 {
                     "role": "user",
@@ -79,10 +78,25 @@ class MemoryMemory(AbstractMemory):
                     "如果上面的【对话内容】中没有需要长期记住的信息，你应该返回空列表：[]\n"
                     "你应该直接返回文字内容，不能进行函数调用。".format(history),
                 },
-            ],
+            ]
+        response = openai.Client(
+            base_url=system_config.MEMORY_SUMMARY_OPENAI_API_BASE,
+            api_key=system_config.MEMORY_SUMMARY_OPENAI_API_KEY,
+        ).chat.completions.create(
+            model=system_config.MEMORY_SUMMARY_OPENAI_MODEL,
+            messages=messages,
         )
         message = response.choices[0].message
         long_memory_items = json.loads(message.content)
+        # 记录记忆抽取的结果，后续可用户优化效果
+        recorder_manager.get_recorder().record(
+            RecordItem(
+                source=RECORD_SOURCE_MEMORY,
+                type=RECORD_TYPE_EXTRACT_MEMORY,
+                data={"messages": messages, "result": long_memory_items},
+            )
+        )
+
         items = []
         for item in long_memory_items:
             items.append(LongMemoryItem.new(content=item, id=str(time.time_ns()),

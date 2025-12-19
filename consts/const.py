@@ -4,3 +4,4 @@ RECORD_SOURCE_EAR = "ear"
 
 RECORD_TYPE_CHAT_DATA = "chat_data"
 RECORD_TYPE_LISTEN_RESULT = "listen_result"
+RECORD_TYPE_EXTRACT_MEMORY = "extract_memory"

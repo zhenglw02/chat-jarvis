@@ -6,6 +6,10 @@ from chromadb.utils import embedding_functions
 from modules.long_memory.long_memory_interface import AbstractLongMemory, LongMemoryItem
 from config import system_config
 
+from recorder import recorder_manager
+from recorder.recorder_interface import RecordItem
+from consts.const import *
+
 
 class ChromaLongMemory(AbstractLongMemory):
     def __init__(self):
